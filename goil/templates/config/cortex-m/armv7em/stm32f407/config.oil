@@ -1015,6 +1015,16 @@ CPU stm32f407 {
     CFILE = "pinAccess.c";
   };
 
+  PLATFORM_FILES stm32f407_lib {
+    PATH = "cortex-m/armv7em/stm32f407/newlib";
+    CFILE = "sbrk.c";
+    CFILE = "write.c";
+    CFILE = "syscalls.c";
+    CFILE = "assert.c";
+    CFILE = "trace.c";
+    CFILE = "trace-impl.c";
+  };
+
   POSTBUILD all {
     COMMAND buildbin {
       TYPE = COPIER;

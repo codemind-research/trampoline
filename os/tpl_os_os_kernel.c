@@ -31,6 +31,12 @@
 #include "tpl_os_hooks.h"
 #include "tpl_os_kernel.h"
 #include "tpl_trace.h"
+//$crichton
+#include <stdio.h>
+#include <stdlib.h>
+extern struct proc_info* proc_log;
+extern void print_time(FILE *);
+
 
 #if NUMBER_OF_CORES > 1
 #include "tpl_os_multicore_kernel.h"
@@ -185,7 +191,24 @@ tpl_call_shutdown_os(CONST(tpl_status, AUTOMATIC) error /*@unused@*/)
 #if SPINLOCK_COUNT > 0
   RELEASE_ALL_SPINLOCKS(core_id);
 #endif
-
+//$crichton
+#ifndef POSIX
+  trace_printf("\n");
+  print_time(NULL);
+  trace_printf(" End OS\n");
+  if (proc_log != NULL)
+        free(proc_log);
+#else
+  if (crichton_log != NULL)
+  {
+      fprintf(crichton_log,"\r\n");
+      print_time(crichton_log);
+      fprintf(crichton_log," End OS\r\n");
+      if (proc_log != NULL)
+          free(proc_log);
+      fclose(crichton_log);
+  }
+#endif
   /* architecture dependant shutdown. */
   tpl_shutdown();
 }

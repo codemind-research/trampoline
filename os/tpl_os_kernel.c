@@ -61,6 +61,31 @@
 #define OS_START_SEC_CONST_UNSPECIFIED
 #include "tpl_memmap.h"
 
+//$crichton
+#include "tpl_os_crichton.h"
+
+FILE* crichton_log = NULL;
+//proc_info proc_log[TASK_COUNT+ISR_COUNT];
+proc_info *proc_log = NULL;
+char buf[255] = {0};
+bitflip flip;
+extern CONSTP2CONST(char, AUTOMATIC, OS_APPL_DATA) proc_name_table[];
+
+void print_time(FILE *f)
+{
+    time_t timer;
+    struct tm* t;
+    timer=time(NULL);
+    t = localtime(&timer);
+
+#ifdef POSIX
+    fprintf(f,"@crichton: [%d/%d/%d %d:%d:%d]",t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+#else
+    trace_printf("@crichton: [%d/%d/%d %d:%d:%d]",t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+#endif
+}
+
+
 /**
  * @def INVALID_PROC
  *
@@ -780,6 +805,17 @@ FUNC(void, OS_CODE) tpl_start(CORE_ID_OR_VOID(core_id))
      * the object has not be preempted. So its
      * descriptor must be initialized
      */
+    
+    //$crichton
+    if (proc.id < TASK_COUNT)
+    {
+        proc_log[proc.id].run_cnt++;
+        log_write_time(" ");
+        log_write("running...: ");
+        log_write(proc_name_table[proc.id]);
+        sprintf(buf," %d",proc_log[proc.id].run_cnt);
+        log_writeln(buf);
+    }
     DOW_DO(printf("%s is a new proc\n", proc_name_table[proc.id]));
     tpl_init_proc(proc.id);
     tpl_dyn_proc_table[proc.id]->priority = proc.key;
@@ -1174,6 +1210,10 @@ FUNC(void, OS_CODE) tpl_init_proc(CONST(tpl_proc_id, AUTOMATIC) proc_id)
 FUNC(void, OS_CODE) tpl_init_os(CONST(tpl_application_mode, AUTOMATIC) app_mode)
 {
   GET_CURRENT_CORE_ID(core_id)
+  //$crichton
+  log_write_time(" ");
+  log_writeln("Init OS\r\n");
+  proc_log = (proc_info *)malloc((TASK_COUNT + ISR_COUNT) * sizeof(proc_info));
 #if TASK_COUNT > 0 || ALARM_COUNT > 0 || SCHEDTABLE_COUNT > 0
   VAR(uint16, AUTOMATIC) i;
   CONST(tpl_appmode_mask, AUTOMATIC) app_mode_mask = 1 << app_mode;
@@ -1206,6 +1246,15 @@ FUNC(void, OS_CODE) tpl_init_os(CONST(tpl_application_mode, AUTOMATIC) app_mode)
 #endif
 
 #if TASK_COUNT > 0
+  //$crichton
+  for (i = 0; i < TASK_COUNT + ISR_COUNT; i++)
+  {
+    log_write_time(" ");
+    log_write("Target: "); 
+    log_writeln(proc_name_table[i]);
+    proc_log[i].run_cnt = 0;
+  }
+  log_writeln("");
   /*  Look for autostart tasks    */
   for (i = 0; i < TASK_COUNT; i++)
   {
