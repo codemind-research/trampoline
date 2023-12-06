@@ -1,0 +1,11 @@
+[
+ {  "id": 1, 
+    "trigger": 500, 
+    "cycle": 100000,  
+    "mode": "taint",
+    "var": "v1",
+    "value": "10",
+    "pattern": "random",
+    "target": "periodic.c"
+ }
+]
