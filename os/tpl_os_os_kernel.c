@@ -199,15 +199,11 @@ tpl_call_shutdown_os(CONST(tpl_status, AUTOMATIC) error /*@unused@*/)
   if (proc_log != NULL)
         free(proc_log);
 #else
-  if (crichton_log != NULL)
-  {
-      fprintf(crichton_log,"\r\n");
-      print_time(crichton_log);
-      fprintf(crichton_log," End OS\r\n");
-      if (proc_log != NULL)
-          free(proc_log);
-      fclose(crichton_log);
-  }
+  fprintf(stdout,"\r\n");
+  print_time(stdout);
+  fprintf(stdout," End OS\r\n");
+  if (proc_log != NULL)
+      free(proc_log);
 #endif
   /* architecture dependant shutdown. */
   tpl_shutdown();
