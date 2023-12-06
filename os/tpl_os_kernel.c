@@ -813,7 +813,7 @@ FUNC(void, OS_CODE) tpl_start(CORE_ID_OR_VOID(core_id))
         log_write_time(" ");
         log_write("running...: ");
         log_write(proc_name_table[proc.id]);
-        sprintf(buf," %d",proc_log[proc.id].run_cnt);
+        sprintf(buf," %d %d",proc_log[proc.id].run_cnt,SystemCounter_counter_desc.current_date);
         log_writeln(buf);
     }
     DOW_DO(printf("%s is a new proc\n", proc_name_table[proc.id]));
