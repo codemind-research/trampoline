@@ -1,0 +1,21 @@
+{
+    "tasks": [
+        {
+            "name": "tick",
+            "start": 100,
+            "cycle": 100,
+            "priority": 10,
+            "file": "tick.c"
+        },
+        {
+            "name": "tick2",
+            "start": 100,
+            "cycle": 200,
+            "priority": 1,
+            "file": "tick.c"
+        }
+
+    ],
+    
+    "stop": 1000
+}
